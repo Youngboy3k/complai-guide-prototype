@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User } from "lucide-react";
+import { Send, Bot, User, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +23,7 @@ const ChatPage = () => {
   
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Dummy AI responses
@@ -78,6 +79,12 @@ const ChatPage = () => {
     }
   };
 
+  const copyMessage = (messageId: string, content: string) => {
+    navigator.clipboard.writeText(content);
+    setCopiedMessageId(messageId);
+    setTimeout(() => setCopiedMessageId(null), 2000);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <div className="container mx-auto px-6 py-8">
@@ -122,23 +129,42 @@ const ChatPage = () => {
                         <Bot className="w-4 h-4" />
                       )}
                     </div>
-                    <div className={`max-w-[70%] ${
-                      message.sender === "user" ? "text-right" : "text-left"
-                    }`}>
-                      <div className={`rounded-lg px-4 py-2 ${
-                        message.sender === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-secondary text-foreground"
-                      }`}>
-                        <p className="text-sm leading-relaxed">{message.content}</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {message.timestamp.toLocaleTimeString([], { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </p>
-                    </div>
+                     <div className={`max-w-[70%] ${
+                       message.sender === "user" ? "text-right" : "text-left"
+                     }`}>
+                       <div className={`group relative rounded-lg px-4 py-2 ${
+                         message.sender === "user"
+                           ? "bg-primary text-primary-foreground"
+                           : "bg-secondary text-foreground"
+                       }`}>
+                         <p className="text-sm leading-relaxed">{message.content}</p>
+                         {message.sender === "ai" && (
+                           <Button
+                             variant="ghost"
+                             size="sm"
+                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                             onClick={() => copyMessage(message.id, message.content)}
+                           >
+                             {copiedMessageId === message.id ? (
+                               <Check className="w-3 h-3" />
+                             ) : (
+                               <Copy className="w-3 h-3" />
+                             )}
+                           </Button>
+                         )}
+                       </div>
+                       <div className="flex items-center space-x-2 mt-1">
+                         <p className="text-xs text-muted-foreground">
+                           {message.timestamp.toLocaleTimeString([], { 
+                             hour: '2-digit', 
+                             minute: '2-digit' 
+                           })}
+                         </p>
+                         {copiedMessageId === message.id && (
+                           <span className="text-xs text-green-600">Copied!</span>
+                         )}
+                       </div>
+                     </div>
                   </div>
                 ))}
                 
