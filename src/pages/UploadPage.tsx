@@ -1,44 +1,40 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, FileText, CheckCircle, MessageCircle, Info, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Upload, FileText, CheckCircle, Clock, AlertTriangle, Sparkles, Shield, MessageSquare } from "lucide-react";
 
 const UploadPage = () => {
+  const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
-  const navigate = useNavigate();
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
+    if (file && file.type === "application/pdf") {
       setSelectedFile(file);
-      event.target.value = '';
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
+  const handleDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent) => {
+    event.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    setIsDragOver(false);
     
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
+    const files = event.dataTransfer.files;
+    const file = files[0];
+    
+    if (file && file.type === "application/pdf") {
       setSelectedFile(file);
     }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
   };
 
   const handleAnalyze = async () => {
@@ -58,283 +54,233 @@ const UploadPage = () => {
     
     localStorage.setItem('uploadedFile', JSON.stringify(fileInfo));
     
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // Simulate upload delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
     setIsUploading(false);
     navigate("/report");
   };
 
-  // Mock recent uploads with dates and times
+  const demoFiles = [
+    { name: "Corporate_Privacy_Policy.pdf", icon: FileText, gradient: "from-blue-500 to-blue-600" },
+    { name: "Q3_Financial_Report.pdf", icon: FileText, gradient: "from-green-500 to-green-600" },
+    { name: "Employee_Handbook_2024.docx", icon: FileText, gradient: "from-purple-500 to-purple-600" },
+  ];
+
   const recentUploads = [
-    { 
-      name: "Q3_Financial_Report.pdf", 
-      date: "July 15, 2025", 
-      time: "2:30 PM",
-      size: "2.4 MB",
-      analysisDate: "2025-07-15T14:30:00Z"
-    },
-    { 
-      name: "Privacy_Policy_2024.pdf", 
-      date: "July 12, 2025", 
-      time: "10:15 AM",
-      size: "1.8 MB",
-      analysisDate: "2025-07-12T10:15:00Z"
-    },
-    { 
-      name: "Employee_Handbook.pdf", 
-      date: "July 10, 2025", 
-      time: "4:45 PM",
-      size: "3.2 MB",
-      analysisDate: "2025-07-10T16:45:00Z"
-    }
+    { name: "Q3_Compliance_Review.pdf", date: "2 hours ago", status: "completed", score: 87 },
+    { name: "Internal_Audit_Report.pdf", date: "Yesterday", status: "completed", score: 92 },
+    { name: "Policy_Update_Draft.pdf", date: "3 days ago", status: "pending", score: null },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <div className="container mx-auto px-6 py-12">
-        <div className="max-w-2xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-3xl font-bold text-foreground mb-4">
-              Upload Your Compliance Document
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Upload a document to get started with compliance analysis. 
-              Our system will review the document and generate a comprehensive report.
-            </p>
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <div className="bg-hero py-20 px-8">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <div className="w-24 h-24 bg-gradient-primary rounded-3xl flex items-center justify-center mx-auto shadow-large">
+            <Upload className="w-12 h-12 text-white" />
           </div>
+          <h1 className="text-6xl font-bold text-foreground tracking-tight leading-tight">
+            Upload Your Document
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Upload a PDF document to analyze for compliance issues and generate detailed reports with AI-powered insights
+          </p>
+        </div>
+      </div>
 
-          {/* File Upload Status */}
-          <Card className="shadow-medium mb-6 bg-amber-50 border-amber-200">
-            <CardContent className="p-4">
-              <div className="flex items-start space-x-3">
-                <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
-                <div>
-                  <h3 className="font-medium text-amber-900 mb-1">File Upload Notice</h3>
-                  <p className="text-sm text-amber-700 mb-2">
-                    File picker buttons may not work in all environments. Please use:
-                  </p>
-                  <div className="text-xs text-amber-600">
-                    ✅ <strong>Drag & Drop</strong> (works everywhere) • ✅ <strong>Demo files</strong> (always work)
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Upload Card */}
-          <Card className="shadow-large">
-            <CardContent className="p-8">
-              {!selectedFile ? (
-                <div className="text-center">
-                  {/* Primary: Drag & Drop Zone */}
-                  <div 
-                    className={`border-2 border-dashed rounded-lg p-12 mb-6 transition-all duration-200 cursor-pointer ${
-                      dragActive 
-                        ? "border-primary bg-primary/5 scale-102" 
-                        : "border-border hover:border-primary/50 hover:bg-gradient-hero"
-                    }`}
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                  >
-                    <Upload className={`w-16 h-16 mx-auto mb-4 ${
-                      dragActive ? "text-primary" : "text-muted-foreground"
-                    }`} />
-                    <h3 className="text-xl font-medium text-foreground mb-2">
-                      {dragActive ? "Drop your file here!" : "Drag & Drop Your File Here"}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Supports PDF, DOC, DOCX, TXT, and image files
-                    </p>
-                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
-                      <Upload className="w-4 h-4 mr-1" />
-                      Recommended Method
-                    </div>
-                  </div>
-
-                  {/* Secondary: Demo Files */}
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Or try these sample documents:
-                    </p>
-                    <div className="flex flex-wrap justify-center gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          const fakeFile = new File(
-                            ['Sample compliance policy with GDPR requirements...'], 
-                            'Corporate_Privacy_Policy.pdf', 
-                            { type: 'application/pdf' }
-                          );
-                          setSelectedFile(fakeFile);
-                        }}
-                      >
-                        📄 Privacy Policy
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          const fakeFile = new File(
-                            ['Employee handbook with HR policies...'], 
-                            'Employee_Handbook_2024.docx', 
-                            { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
-                          );
-                          setSelectedFile(fakeFile);
-                        }}
-                      >
-                        📋 Employee Handbook
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          const fakeFile = new File(
-                            ['Financial reporting and audit procedures...'], 
-                            'Q3_Financial_Report.pdf', 
-                            { type: 'application/pdf' }
-                          );
-                          setSelectedFile(fakeFile);
-                        }}
-                      >
-                        💰 Financial Report
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center">
-                  <div className="bg-secondary rounded-lg p-6 mb-6">
-                    <FileText className="w-12 h-12 text-primary mx-auto mb-3" />
-                    <h3 className="text-lg font-medium text-foreground mb-1">
-                      {selectedFile.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Type: {selectedFile.type || 'Unknown'}
-                    </p>
-                  </div>
-                  
-                  <div className="flex items-center justify-center space-x-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => setSelectedFile(null)}
-                      disabled={isUploading}
-                    >
-                      Choose Different File
-                    </Button>
-                    <Button
-                      onClick={handleAnalyze}
-                      disabled={isUploading}
-                      className="min-w-36"
-                    >
-                      {isUploading ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
-                          <span>Analyzing...</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle className="w-4 h-4" />
-                          <span>Analyze Document</span>
-                        </div>
-                      )}
-                    </Button>
-                  </div>
-
-                  {isUploading && (
-                    <div className="mt-6">
-                      <div className="w-full bg-secondary rounded-full h-2">
-                        <div className="bg-primary h-2 rounded-full transition-all duration-1000" style={{ width: "60%" }}></div>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        Processing your document... Please wait
-                      </p>
-                    </div>
+      <div className="px-8 -mt-12">
+        <div className="max-w-4xl mx-auto space-y-16">
+          {/* Main Upload Card */}
+          <div className="bg-card-premium rounded-3xl border border-border/50 shadow-large p-12">
+            <div
+              className={`border-2 border-dashed rounded-2xl p-20 text-center transition-all duration-300 ${
+                isDragOver
+                  ? "border-primary bg-primary/5 scale-105"
+                  : selectedFile
+                  ? "border-green-500 bg-green-50/50"
+                  : "border-border hover:border-primary hover:bg-primary/5 hover:shadow-soft"
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <div className="space-y-8">
+                <div className={`w-24 h-24 mx-auto rounded-3xl flex items-center justify-center shadow-soft transition-all duration-300 ${
+                  selectedFile ? "bg-gradient-to-r from-green-500 to-green-600" : "bg-gradient-primary"
+                }`}>
+                  {selectedFile ? (
+                    <CheckCircle className="w-12 h-12 text-white" />
+                  ) : (
+                    <Upload className="w-12 h-12 text-white" />
                   )}
                 </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Features */}
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: FileText,
-                title: "Document Analysis",
-                description: "Comprehensive review of your compliance documents"
-              },
-              {
-                icon: CheckCircle,
-                title: "Issue Detection",
-                description: "Automatically identify potential compliance issues"
-              },
-              {
-                icon: MessageCircle,
-                title: "Interactive Chat",
-                description: "Ask questions about your compliance report"
-              }
-            ].map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <div key={index} className="text-center p-4 rounded-lg hover:bg-gradient-hero transition-colors">
-                  <div className="w-12 h-12 bg-gradient-hero rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <Icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="font-medium text-foreground mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
+                
+                <div>
+                  <h3 className="text-3xl font-semibold text-foreground mb-4 tracking-tight">
+                    {selectedFile ? selectedFile.name : "Drop your PDF here"}
+                  </h3>
+                  <p className="text-lg text-muted-foreground">
+                    {selectedFile ? "File ready for analysis" : "or click to browse files"}
+                  </p>
                 </div>
-              );
-            })}
+                
+                {!selectedFile && (
+                  <div>
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      id="file-upload"
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="btn-primary cursor-pointer inline-flex items-center space-x-3 text-lg px-8 py-4"
+                    >
+                      <span>Choose File</span>
+                    </label>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* File Notice */}
+            <div className="mt-10 bg-gradient-to-r from-amber-50 to-amber-50/50 border border-amber-200/50 rounded-2xl p-6 flex items-start space-x-5">
+              <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-lg font-semibold text-amber-800">Supported formats</p>
+                <p className="text-base text-amber-700 mt-2">Only PDF files are currently supported. Maximum file size: 50MB</p>
+              </div>
+            </div>
+
+            {/* Analyze Button */}
+            {selectedFile && (
+              <div className="mt-10 text-center">
+                <button
+                  onClick={handleAnalyze}
+                  disabled={isUploading}
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none flex items-center space-x-3 mx-auto text-lg px-10 py-4"
+                >
+                  {isUploading ? (
+                    <>
+                      <Clock className="w-6 h-6 animate-spin" />
+                      <span>Analyzing Document...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-6 h-6" />
+                      <span>Analyze Document</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Demo Files */}
+          <div className="space-y-8">
+            <h2 className="text-4xl font-semibold text-foreground tracking-tight">Try with Demo Files</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {demoFiles.map((file, index) => {
+                const Icon = file.icon;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedFile(new File([], file.name, { type: "application/pdf" }))}
+                    className="card-premium text-left group p-8"
+                  >
+                    <div className="flex items-center space-x-5">
+                      <div className={`w-16 h-16 bg-gradient-to-r ${file.gradient} rounded-2xl flex items-center justify-center shadow-soft group-hover:shadow-medium transition-all duration-200`}>
+                        <Icon className="w-8 h-8 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-foreground">{file.name}</h3>
+                        <p className="text-base text-muted-foreground">Sample document</p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Core Features */}
+          <div className="bg-card-premium rounded-3xl border border-border/50 shadow-large p-12">
+            <h2 className="text-4xl font-semibold text-foreground mb-12 text-center tracking-tight">Core Features</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              <div className="text-center space-y-6">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-soft">
+                  <FileText className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="font-semibold text-2xl text-foreground">PDF Analysis</h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Advanced document parsing and content extraction with AI-powered insights
+                </p>
+              </div>
+              <div className="text-center space-y-6">
+                <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto shadow-soft">
+                  <Shield className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="font-semibold text-2xl text-foreground">Issue Detection</h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Identify compliance gaps and regulatory issues across multiple frameworks
+                </p>
+              </div>
+              <div className="text-center space-y-6">
+                <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-soft">
+                  <MessageSquare className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="font-semibold text-2xl text-foreground">Interactive Chat</h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Ask questions about your compliance analysis and get instant answers
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Recent Uploads */}
-          <div className="mt-12">
-            <h2 className="text-lg font-medium text-foreground mb-6">Recent Uploads</h2>
-            <Card className="shadow-medium">
-              <CardContent className="p-0">
+          <div className="space-y-8 pb-16">
+            <h2 className="text-4xl font-semibold text-foreground tracking-tight">Recent Uploads</h2>
+            <div className="bg-card-premium rounded-3xl border border-border/50 shadow-large overflow-hidden">
+              <div className="divide-y divide-border/50">
                 {recentUploads.map((upload, index) => (
-                  <div key={index} className={`flex items-center justify-between p-4 hover:bg-sidebar-hover transition-colors cursor-pointer ${
-                    index !== recentUploads.length - 1 ? "border-b border-border" : ""
-                  }`}>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-muted-foreground" />
+                  <div key={index} className="p-8 flex items-center justify-between hover:bg-gray-50/50 transition-all duration-200 group">
+                    <div className="flex items-center space-x-6">
+                      <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                        <FileText className="w-7 h-7 text-muted-foreground" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-foreground">{upload.name}</h4>
-                        <p className="text-xs text-muted-foreground">{upload.date} at {upload.time} • {upload.size}</p>
+                        <h3 className="font-semibold text-lg text-foreground">{upload.name}</h3>
+                        <p className="text-base text-muted-foreground">{upload.date}</p>
                       </div>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-primary hover:text-primary hover:bg-primary/10"
-                      onClick={() => {
-                        const mockFileInfo = {
-                          name: upload.name,
-                          size: parseFloat(upload.size) * 1024 * 1024,
-                          type: 'application/pdf',
-                          lastModified: Date.now(),
-                          uploadDate: upload.analysisDate,
-                          analysisDate: upload.analysisDate,
-                          analysisTime: `${upload.date} at ${upload.time}`
-                        };
-                        localStorage.setItem('uploadedFile', JSON.stringify(mockFileInfo));
-                        navigate("/report");
-                      }}
-                    >
-                      View Report
-                    </Button>
+                    <div className="flex items-center space-x-5">
+                      {upload.score && (
+                        <div className={`px-4 py-2 rounded-xl text-sm font-semibold ${
+                          upload.score >= 90 ? "bg-green-100 text-green-700" : 
+                          upload.score >= 80 ? "bg-blue-100 text-blue-700" :
+                          upload.score >= 70 ? "bg-orange-100 text-orange-700" :
+                          "bg-red-100 text-red-700"
+                        }`}>
+                          {upload.score}%
+                        </div>
+                      )}
+                      <div className={`px-4 py-2 rounded-xl text-sm font-semibold ${
+                        upload.status === "completed" 
+                          ? "bg-green-100 text-green-700" 
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}>
+                        {upload.status}
+                      </div>
+                    </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>

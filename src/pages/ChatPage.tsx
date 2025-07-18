@@ -1,9 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Copy, Check, FileText, Calendar, Clock, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Send, Bot, User, Copy, Check, FileText, Calendar, Clock, MessageSquare, Sparkles } from "lucide-react";
 
 interface Message {
   id: string;
@@ -22,27 +18,6 @@ interface ReportInfo {
   mediumIssues: number;
   lowIssues: number;
 }
-
-// Simple dropdown component
-const Select = ({ value, onValueChange, children, placeholder }: { 
-  value: string; 
-  onValueChange: (value: string) => void; 
-  children: React.ReactNode;
-  placeholder?: string;
-}) => (
-  <select 
-    value={value} 
-    onChange={(e) => onValueChange(e.target.value)} 
-    className="px-3 py-2 border border-border rounded-md text-sm bg-background min-w-48"
-  >
-    {placeholder && <option value="">{placeholder}</option>}
-    {children}
-  </select>
-);
-
-const SelectItem = ({ value, children }: { value: string; children: React.ReactNode }) => (
-  <option value={value}>{children}</option>
-);
 
 const ChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -90,7 +65,7 @@ const ChatPage = () => {
     }
   ];
 
-  // Dummy AI responses based on current report
+  // Dummy AI responses
   const getDummyResponse = (reportName: string) => {
     const baseResponses = [
       `Based on the compliance analysis of ${reportName}, this issue requires immediate attention due to regulatory requirements.`,
@@ -109,7 +84,6 @@ const ChatPage = () => {
 
   // Load current report from localStorage on mount
   useEffect(() => {
-    // Check for specifically selected report first
     const selectedReport = localStorage.getItem('selectedReportForChat');
     if (selectedReport) {
       try {
@@ -118,11 +92,10 @@ const ChatPage = () => {
         setSelectedReportId("selected");
         setMessages([{
           id: "1",
-          content: `Hello! I'm your compliance assistant. You've selected "${reportInfo.documentName}" analyzed on ${reportInfo.analysisTime}. The document has a compliance score of ${reportInfo.overallScore}% with ${reportInfo.issueCount} issues identified. What would you like to know about this report?`,
+          content: `Hello! I'm your compliance assistant. 🤖 You've selected "${reportInfo.documentName}" analyzed on ${reportInfo.analysisTime}. The document has a compliance score of ${reportInfo.overallScore}% with ${reportInfo.issueCount} issues identified. What would you like to know about this report?`,
           sender: "ai",
           timestamp: new Date()
         }]);
-        // Clear the selected report from storage after loading
         localStorage.removeItem('selectedReportForChat');
         return;
       } catch (error) {
@@ -130,7 +103,6 @@ const ChatPage = () => {
       }
     }
 
-    // Fallback to current report
     const storedReport = localStorage.getItem('currentReport');
     if (storedReport) {
       try {
@@ -139,7 +111,7 @@ const ChatPage = () => {
         setSelectedReportId("current");
         setMessages([{
           id: "1",
-          content: `Hello! I'm your compliance assistant. I've reviewed "${reportInfo.documentName}" analyzed on ${reportInfo.analysisTime}. The document has a compliance score of ${reportInfo.overallScore}% with ${reportInfo.issueCount} issues identified. What would you like to know about this report?`,
+          content: `Hello! I'm your compliance assistant. 🤖 I've reviewed "${reportInfo.documentName}" analyzed on ${reportInfo.analysisTime}. The document has a compliance score of ${reportInfo.overallScore}% with ${reportInfo.issueCount} issues identified. What would you like to know about this report?`,
           sender: "ai",
           timestamp: new Date()
         }]);
@@ -155,7 +127,7 @@ const ChatPage = () => {
   const setDefaultMessage = () => {
     setMessages([{
       id: "1",
-      content: "Hello! I'm your compliance assistant. Please select a report from the dropdown above to start discussing compliance findings. What would you like to know?",
+      content: "Hello! I'm your compliance assistant. 🤖 Please select a report from the dropdown above to start discussing compliance findings. What would you like to know?",
       sender: "ai",
       timestamp: new Date()
     }]);
@@ -167,7 +139,7 @@ const ChatPage = () => {
     if ((reportId === "current" || reportId === "selected") && currentReport) {
       setMessages([{
         id: "1",
-        content: `Hello! I'm your compliance assistant. I've reviewed "${currentReport.documentName}" analyzed on ${currentReport.analysisTime}. The document has a compliance score of ${currentReport.overallScore}% with ${currentReport.issueCount} issues identified. What would you like to know about this report?`,
+        content: `Hello! I'm your compliance assistant. 🤖 I've reviewed "${currentReport.documentName}" analyzed on ${currentReport.analysisTime}. The document has a compliance score of ${currentReport.overallScore}% with ${currentReport.issueCount} issues identified. What would you like to know about this report?`,
         sender: "ai",
         timestamp: new Date()
       }]);
@@ -208,7 +180,6 @@ const ChatPage = () => {
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate AI response delay
     setTimeout(() => {
       const activeReport = selectedReportId === "current" ? currentReport : 
                           availableReports.find(r => r.id === selectedReportId);
@@ -247,7 +218,6 @@ const ChatPage = () => {
     "Are there any regulatory deadlines I should know about?"
   ];
 
-  // Get current active report for display
   const getActiveReport = () => {
     if (selectedReportId === "current" || selectedReportId === "selected") return currentReport;
     return availableReports.find(r => r.id === selectedReportId);
@@ -256,155 +226,165 @@ const ChatPage = () => {
   const activeReport = getActiveReport();
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <div className="container mx-auto px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Compliance Assistant
-            </h1>
-            <p className="text-muted-foreground">
-              Ask questions about your compliance reports and get detailed explanations.
-            </p>
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <div className="bg-hero py-16 px-8">
+        <div className="max-w-5xl mx-auto text-center space-y-8">
+          <div className="w-24 h-24 bg-gradient-primary rounded-3xl flex items-center justify-center mx-auto shadow-large">
+            <MessageSquare className="w-12 h-12 text-white" />
+          </div>
+          <h1 className="text-5xl font-bold text-foreground tracking-tight">
+            Compliance Assistant
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Ask questions about your compliance reports and get detailed explanations from our AI assistant
+          </p>
+        </div>
+      </div>
+
+      <div className="px-8 -mt-8">
+        <div className="max-w-5xl mx-auto space-y-8">
+          {/* Report Selection */}
+          <div className="bg-card-premium rounded-3xl border border-border/50 shadow-large p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-5">
+                <div className="w-12 h-12 bg-gradient-blue-subtle rounded-2xl flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-semibold text-foreground">Select Report to Discuss</h3>
+                  <p className="text-lg text-muted-foreground">Choose which compliance report you'd like to chat about</p>
+                </div>
+              </div>
+              <select 
+                value={selectedReportId} 
+                onChange={(e) => handleReportChange(e.target.value)}
+                className="input-premium min-w-80 text-lg"
+              >
+                <option value="">Choose a report...</option>
+                {currentReport && (
+                  <option value={selectedReportId === "selected" ? "selected" : "current"}>
+                    {currentReport.documentName} (Selected)
+                  </option>
+                )}
+                {availableReports.map(report => (
+                  <option key={report.id} value={report.id}>
+                    {report.documentName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Active Report Info */}
+            {activeReport && (
+              <div className="bg-gradient-blue-subtle rounded-2xl p-6 border border-primary/10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-5">
+                    <div className="w-14 h-14 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-soft">
+                      <FileText className="w-7 h-7 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-semibold text-foreground">{activeReport.documentName}</h4>
+                      <div className="flex items-center space-x-6 text-base text-muted-foreground mt-1">
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="w-4 h-4" />
+                          <span>{activeReport.analysisDate}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Clock className="w-4 h-4" />
+                          <span>{activeReport.analysisTime}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-6">
+                    <div className={`px-5 py-3 rounded-2xl text-lg font-bold ${
+                      activeReport.overallScore >= 80 ? "bg-green-100 text-green-700" : 
+                      activeReport.overallScore >= 60 ? "bg-orange-100 text-orange-700" : 
+                      "bg-red-100 text-red-700"
+                    }`}>
+                      {activeReport.overallScore}% Score
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-semibold text-foreground">{activeReport.issueCount} Issues</div>
+                      <div className="text-base text-muted-foreground">
+                        {activeReport.highIssues}H • {activeReport.mediumIssues}M • {activeReport.lowIssues}L
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Report Selection */}
-          <Card className="shadow-medium mb-6">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <div>
-                    <h3 className="font-medium text-foreground">Select Report to Discuss</h3>
-                    <p className="text-sm text-muted-foreground">Choose which compliance report you'd like to chat about</p>
-                  </div>
-                </div>
-                <Select 
-                  value={selectedReportId} 
-                  onValueChange={handleReportChange}
-                  placeholder="Choose a report..."
-                >
-                  {currentReport && (
-                    <SelectItem value={selectedReportId === "selected" ? "selected" : "current"}>
-                      {currentReport.documentName} (Selected)
-                    </SelectItem>
-                  )}
-                  {availableReports.map(report => (
-                    <SelectItem key={report.id} value={report.id}>
-                      {report.documentName}
-                    </SelectItem>
-                  ))}
-                </Select>
-              </div>
-              
-              {/* Active Report Info */}
-              {activeReport && (
-                <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
-                        <FileText className="w-4 h-4 text-primary" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-foreground">{activeReport.documentName}</h4>
-                        <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="w-3 h-3" />
-                            <span>{activeReport.analysisDate}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="w-3 h-3" />
-                            <span>{activeReport.analysisTime}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <Badge variant={activeReport.overallScore >= 80 ? "default" : activeReport.overallScore >= 60 ? "secondary" : "destructive"}>
-                        {activeReport.overallScore}% Score
-                      </Badge>
-                      <div className="text-right text-sm">
-                        <div className="font-medium text-foreground">{activeReport.issueCount} Issues</div>
-                        <div className="text-xs text-muted-foreground">
-                          {activeReport.highIssues}H • {activeReport.mediumIssues}M • {activeReport.lowIssues}L
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
           {/* Chat Container */}
-          <Card className="shadow-large">
-            <CardHeader className="border-b border-border flex-shrink-0">
-              <CardTitle className="flex items-center space-x-2">
-                <Bot className="w-5 h-5 text-primary" />
-                <span>Chat with AI Assistant</span>
-                {activeReport && (
-                  <span className="text-sm font-normal text-muted-foreground">
-                    • {activeReport.documentName}
-                  </span>
-                )}
-              </CardTitle>
-            </CardHeader>
+          <div className="bg-card-premium rounded-3xl border border-border/50 shadow-large overflow-hidden" style={{ height: "70vh" }}>
+            <div className="bg-gradient-blue-subtle border-b border-border/50 p-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-10 h-10 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-soft">
+                  <Bot className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-foreground">Chat with AI Assistant</h3>
+                  {activeReport && (
+                    <p className="text-base text-muted-foreground">{activeReport.documentName}</p>
+                  )}
+                </div>
+              </div>
+            </div>
             
-            <CardContent className="p-0 flex flex-col" style={{ height: "60vh" }}>
-              {/* Messages Area - Scrollable */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
+            <div className="flex flex-col h-full">
+              {/* Messages Area */}
+              <div className="flex-1 overflow-y-auto p-8 space-y-6 min-h-0">
                 {messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`flex items-start space-x-3 ${
+                    className={`flex items-start space-x-4 ${
                       message.sender === "user" ? "flex-row-reverse space-x-reverse" : ""
                     }`}
                   >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-soft ${
                       message.sender === "user" 
-                        ? "bg-primary text-primary-foreground" 
-                        : "bg-secondary text-muted-foreground"
+                        ? "bg-gradient-primary text-white" 
+                        : "bg-gray-100 text-muted-foreground"
                     }`}>
                       {message.sender === "user" ? (
-                        <User className="w-4 h-4" />
+                        <User className="w-6 h-6" />
                       ) : (
-                        <Bot className="w-4 h-4" />
+                        <Bot className="w-6 h-6" />
                       )}
                     </div>
-                    <div className={`max-w-[70%] ${
+                    <div className={`max-w-[75%] ${
                       message.sender === "user" ? "text-right" : "text-left"
                     }`}>
-                      <div className={`group relative rounded-lg px-4 py-3 ${
+                      <div className={`group relative rounded-2xl px-6 py-4 ${
                         message.sender === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-secondary text-foreground"
+                          ? "bg-gradient-primary text-white"
+                          : "bg-gray-50 text-foreground"
                       }`}>
-                        <p className="text-sm leading-relaxed break-words">{message.content}</p>
+                        <p className="text-base leading-relaxed break-words">{message.content}</p>
                         {message.sender === "ai" && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                          <button
+                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-gray-200 rounded-xl"
                             onClick={() => copyMessage(message.id, message.content)}
                           >
                             {copiedMessageId === message.id ? (
-                              <Check className="w-3 h-3" />
+                              <Check className="w-4 h-4 text-green-600" />
                             ) : (
-                              <Copy className="w-3 h-3" />
+                              <Copy className="w-4 h-4 text-gray-600" />
                             )}
-                          </Button>
+                          </button>
                         )}
                       </div>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <p className="text-xs text-muted-foreground">
+                      <div className="flex items-center space-x-3 mt-2">
+                        <p className="text-sm text-muted-foreground">
                           {message.timestamp.toLocaleTimeString([], { 
                             hour: '2-digit', 
                             minute: '2-digit' 
                           })}
                         </p>
                         {copiedMessageId === message.id && (
-                          <span className="text-xs text-green-600">Copied!</span>
+                          <span className="text-sm text-green-600 font-semibold">Copied!</span>
                         )}
                       </div>
                     </div>
@@ -413,65 +393,65 @@ const ChatPage = () => {
                 
                 {/* Typing Indicator */}
                 {isTyping && (
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center">
-                      <Bot className="w-4 h-4" />
+                  <div className="flex items-start space-x-4">
+                    <div className="w-12 h-12 rounded-2xl bg-gray-100 text-muted-foreground flex items-center justify-center shadow-soft">
+                      <Bot className="w-6 h-6" />
                     </div>
-                    <div className="bg-secondary rounded-lg px-4 py-3">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                    <div className="bg-gray-50 rounded-2xl px-6 py-4">
+                      <div className="flex space-x-2">
+                        <div className="w-3 h-3 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div className="w-3 h-3 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                        <div className="w-3 h-3 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
                       </div>
                     </div>
                   </div>
                 )}
-                
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input Area - Fixed at bottom */}
-              <div className="border-t border-border p-6 flex-shrink-0 bg-background">
-                <div className="flex space-x-4">
-                  <Input
+              {/* Input Area */}
+              <div className="bg-gradient-blue-subtle border-t border-border/50 p-6">
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder={activeReport ? `Ask about ${activeReport.documentName}...` : "Select a report first..."}
-                    disabled={isTyping || !selectedReportId}
-                    className="flex-1"
+                    placeholder="Ask about compliance issues, recommendations, or regulations..."
+                    className="flex-1 input-premium text-lg"
+                    disabled={isTyping}
                   />
-                  <Button
+                  <button
                     onClick={handleSendMessage}
-                    disabled={!inputValue.trim() || isTyping || !selectedReportId}
-                    className="flex items-center space-x-2"
+                    disabled={!inputValue.trim() || isTyping}
+                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none p-4"
                   >
-                    <Send className="w-4 h-4" />
-                    <span>Send</span>
-                  </Button>
+                    <Send className="w-6 h-6" />
+                  </button>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Press Enter to send • {selectedReportId ? "AI responses tailored to selected report" : "Select a report to start chatting"}
-                </p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Quick Questions */}
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {quickQuestions.map((question, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                className="text-left justify-start h-auto py-3 px-4 text-wrap"
-                onClick={() => {
-                  setInputValue(question);
-                }}
-                disabled={isTyping || !selectedReportId}
-              >
-                <span className="text-sm text-left">{question}</span>
-              </Button>
-            ))}
+          <div className="bg-card-premium rounded-3xl border border-border/50 shadow-large p-8 mb-16">
+            <div className="flex items-center space-x-4 mb-8">
+              <div className="w-12 h-12 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-soft">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-semibold text-foreground">Quick Questions</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {quickQuestions.map((question, index) => (
+                <button
+                  key={index}
+                  onClick={() => setInputValue(question)}
+                  className="text-left p-5 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-all duration-200 hover:-translate-y-1 hover:shadow-soft border border-gray-200"
+                >
+                  <p className="text-base text-foreground font-medium">{question}</p>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

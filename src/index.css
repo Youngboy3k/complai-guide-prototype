@@ -2,58 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* GitBook-inspired design system */
+/* Apple-style premium design system */
 
 @layer base {
   :root {
-    /* Core GitBook colors */
+    /* Apple Blue Theme - Core Colors */
     --background: 0 0% 100%;
-    --foreground: 216 11% 17%;
+    --foreground: 240 9% 11%; /* #1C1C1E Apple's dark gray */
 
     --card: 0 0% 100%;
-    --card-foreground: 216 11% 17%;
+    --card-foreground: 240 9% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 216 11% 17%;
+    --popover-foreground: 240 9% 11%;
 
-    /* GitBook blue accent */
-    --primary: 217 91% 60%;
+    /* Apple Blue Primary - rgb(0, 122, 255) converted to HSL */
+    --primary: 212 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    /* Subtle grays */
-    --secondary: 220 13% 97%;
-    --secondary-foreground: 216 11% 17%;
+    /* Apple Grays */
+    --secondary: 240 5% 96%; /* #F5F5F7 */
+    --secondary-foreground: 240 9% 11%;
 
-    --muted: 220 13% 97%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 6% 56%; /* #8E8E93 Apple's secondary text */
 
-    --accent: 220 13% 97%;
-    --accent-foreground: 216 11% 17%;
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 9% 11%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Subtle borders */
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 91% 60%;
+    /* Apple-style borders and inputs */
+    --border: 240 6% 90%; /* #E5E5EA */
+    --input: 240 6% 90%;
+    --ring: 212 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* 12px Apple standard */
 
-    /* GitBook-specific design tokens */
+    /* Apple Design Tokens */
     --sidebar-background: 0 0% 100%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-active: 217 91% 60%;
-    --sidebar-hover: 220 13% 97%;
+    --sidebar-border: 240 6% 90%;
+    --sidebar-active: 212 100% 50%;
+    --sidebar-hover: 240 5% 96%;
     
-    /* Gradients */
-    --gradient-subtle: linear-gradient(135deg, hsl(220 13% 99%), hsl(220 13% 97%));
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60% / 0.1), hsl(217 91% 60% / 0.05));
+    /* Apple-style Gradients */
+    --gradient-atmospheric: radial-gradient(ellipse at top, rgba(0, 122, 255, 0.08), transparent 50%), linear-gradient(to bottom, rgb(248, 250, 252), rgb(241, 245, 249));
+    --gradient-card: linear-gradient(145deg, rgb(255, 255, 255), rgb(248, 250, 252));
+    --gradient-hero: radial-gradient(circle at 30% 20%, rgba(0, 122, 255, 0.06), transparent);
+    --gradient-primary: linear-gradient(135deg, rgb(0, 122, 255), rgb(0, 100, 220));
+    --gradient-blue-subtle: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(0, 122, 255, 0.05));
     
-    /* Shadows */
-    --shadow-soft: 0 1px 3px hsl(220 9% 46% / 0.1), 0 1px 2px hsl(220 9% 46% / 0.06);
-    --shadow-medium: 0 4px 6px hsl(220 9% 46% / 0.07), 0 2px 4px hsl(220 9% 46% / 0.06);
-    --shadow-large: 0 10px 15px hsl(220 9% 46% / 0.1), 0 4px 6px hsl(220 9% 46% / 0.05);
+    /* Apple-style Shadows */
+    --shadow-subtle: 0 1px 3px rgba(0, 122, 255, 0.05), 0 1px 2px rgba(0, 122, 255, 0.03);
+    --shadow-soft: 0 4px 12px rgba(0, 122, 255, 0.08), 0 2px 4px rgba(0, 122, 255, 0.04);
+    --shadow-medium: 0 8px 24px rgba(0, 122, 255, 0.12), 0 4px 8px rgba(0, 122, 255, 0.06);
+    --shadow-large: 0 16px 48px rgba(0, 122, 255, 0.16), 0 8px 16px rgba(0, 122, 255, 0.08);
+    --shadow-focus: 0 0 0 3px rgba(0, 122, 255, 0.1);
 
     --sidebar-background: 0 0% 98%;
 
@@ -118,5 +123,62 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  /* Apple-style button variants */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary to-blue-600 text-primary-foreground font-medium rounded-xl px-6 py-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground border border-border font-medium rounded-xl px-6 py-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2;
+  }
+  
+  /* Apple-style cards */
+  .card-premium {
+    @apply bg-gradient-to-br from-white to-gray-50 border border-border/50 rounded-2xl p-6 transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg;
+  }
+  
+  /* Apple-style inputs */
+  .input-premium {
+    @apply w-full px-4 py-3 border border-border rounded-xl bg-white text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50;
+  }
+  
+  /* Apple-style focus states */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2;
+  }
+  
+  /* Atmospheric background */
+  .bg-atmospheric {
+    background: var(--gradient-atmospheric);
+  }
+  
+  /* Hero gradient background */
+  .bg-hero {
+    background: var(--gradient-hero);
+  }
+  
+  /* Premium card gradient */
+  .bg-card-premium {
+    background: var(--gradient-card);
+  }
+  
+  /* Tab control style (iOS-like) */
+  .tab-control {
+    @apply bg-gray-100 p-1 rounded-xl transition-all duration-200;
+  }
+  
+  .tab-control .tab-active {
+    @apply bg-white text-primary shadow-sm rounded-lg px-4 py-2 font-medium transition-all duration-200;
+  }
+  
+  .tab-control .tab-inactive {
+    @apply text-muted-foreground px-4 py-2 font-medium transition-all duration-200 hover:text-foreground;
   }
 }
