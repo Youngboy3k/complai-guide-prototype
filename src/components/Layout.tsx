@@ -3,9 +3,10 @@ import { Upload, FileText, MessageCircle, Lightbulb } from "lucide-react";
 
 const Layout = () => {
   const navItems = [
-    { path: "/", label: "Upload", icon: Upload },
-    { path: "/report", label: "Report", icon: FileText },
-    { path: "/chat", label: "Chat", icon: MessageCircle },
+    { path: "/", label: "Dashboard", icon: Upload },
+    { path: "/upload", label: "Upload", icon: Upload },
+    { path: "/report", label: "Reports", icon: FileText },
+    { path: "/chat", label: "AI Assistant", icon: MessageCircle },
   ];
 
   return (
